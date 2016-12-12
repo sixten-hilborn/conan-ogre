@@ -20,7 +20,7 @@ class OgreConan(ConanFile):
     exports = ["CMakeLists.txt"]
     requires = (
         #"freeimage/3.17.0@sixten-hilborn/testing",
-        "freetype/2.6.3@lasote/stable",
+        "freetype/2.6.3@sixten-hilborn/testing",
         "SDL2/2.0.5@lasote/stable",
         "OIS/1.3@sixten-hilborn/testing",
         "RapidJSON/1.0.2@SamuelMarks/stable",
@@ -28,7 +28,7 @@ class OgreConan(ConanFile):
     )
     url="http://github.com/sixten-hilborn/conan-ogre"
     license="https://opensource.org/licenses/mit-license.php"
-            
+
     def source(self):
         get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
         rename('sinbad-ogre*', self.folder)
@@ -42,7 +42,7 @@ class OgreConan(ConanFile):
         self.run('%s && cmake .. %s %s' % (cd_build, cmake.command_line, options))
         self.output.warn("%s && cmake --build . %s" % (cd_build, cmake.build_config))
         self.run("%s && cmake --build . %s" % (cd_build, cmake.build_config))
-    
+
     def makedir(self, path):
         if self.settings.os == "Windows":
             self.run("IF not exist {0} mkdir {0}".format(path))
