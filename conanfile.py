@@ -3,6 +3,7 @@ import os
 import glob
 from conans.tools import get
 from conans import CMake
+from multiprocessing import cpu_count
 
 def rename(pattern, name):
     for extracted in glob.glob(pattern):
@@ -38,10 +39,9 @@ class OgreConan(ConanFile):
         cmake = CMake(self.settings)
         cd_build = 'cd _build'
         options = '-DOGRE_BUILD_SAMPLES=0 -DOGRE_BUILD_TESTS=0 -DOGRE_BUILD_TOOLS=0'
-        self.output.warn('%s && cmake .. %s %s' % (cd_build, cmake.command_line, options))
-        self.run('%s && cmake .. %s %s' % (cd_build, cmake.command_line, options))
-        self.output.warn("%s && cmake --build . %s" % (cd_build, cmake.build_config))
-        self.run("%s && cmake --build . %s" % (cd_build, cmake.build_config))
+        build_options = '-- -j{0}'.format(cpu_count()) if self.settings.compiler == 'gcc' else ''
+        self.run_and_print('%s && cmake .. %s %s' % (cd_build, cmake.command_line, options))
+        self.run_and_print("%s && cmake --build . %s %s" % (cd_build, cmake.build_config, build_options))
 
     def makedir(self, path):
         if self.settings.os == "Windows":
@@ -50,13 +50,16 @@ class OgreConan(ConanFile):
             self.run("mkdir {0}".format(path))
 
     def package(self):
-        self.copy(pattern="*.h", dst="include/OGRE", src="_build/{0}//include".format(self.folder), keep_path=False)
-        self.copy(pattern="*.h", dst="include/OGRE", src="{0}/OgreMain/include".format(self.folder), keep_path=False)
+        lib_dir = "_build/{0}/lib".format(self.folder)
+        bin_dir = "_build/{0}/bin".format(self.folder)
+        self.copy(pattern="*.h", dst="include/OGRE", src="_build/{0}//include".format(self.folder))
+        self.copy(pattern="*.h", dst="include/OGRE", src="{0}/OgreMain/include".format(self.folder))
         #for subsystem in ['RenderSystems',
         #self.copy(pattern="*.h", dst="include/OGRE", src="{0}/OgreMain/include".format(self.folder), keep_path=False)
-        self.copy("*.lib", dst="lib", src="_build/lib", keep_path=False)
-        self.copy("*.a", dst="lib", src="_build/lib", keep_path=False)
-        self.copy("*.dll", dst="bin", src="_build/bin", keep_path=False)
+        self.copy("*.lib", dst="lib", src=lib_dir, keep_path=False)
+        self.copy("*.a", dst="lib", src=lib_dir, keep_path=False)
+        self.copy("*.so", dst="lib", src=lib_dir, keep_path=False)
+        self.copy("*.dll", dst="bin", src=bin_dir, keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = [
@@ -71,3 +74,7 @@ class OgreConan(ConanFile):
         if self.settings.os == "Windows":
             if self.settings.build_type == "Debug" and self.settings.compiler == "Visual Studio":
                 self.cpp_info.libs = [lib+'_d' for likb in self.cpp_info.libs]
+
+    def run_and_print(self, command):
+        self.output.warn(command)
+        self.run(command)
