@@ -1,0 +1,7 @@
+PROJECT(conanogre)
+cmake_minimum_required(VERSION 2.8)
+include(conanbuildinfo.cmake)
+CONAN_BASIC_SETUP()
+include_directories(${CMAKE_SOURCE_DIR}/ogre-v1.9)
+add_subdirectory("./ogre-v1.9")
+#include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
