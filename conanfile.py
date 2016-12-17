@@ -1,9 +1,19 @@
 from conans import ConanFile
 import os
+import fnmatch
 import glob
-from conans.tools import get
+from conans.tools import get, patch
 from conans import CMake
 from multiprocessing import cpu_count
+
+
+def apply_patches(source, dest):
+    for root, dirnames, filenames in os.walk(source):
+        for filename in fnmatch.filter(filenames, '*.patch'):
+            patch_file = os.path.join(root, filename)
+            dest_path = os.path.join(dest, os.path.relpath(root, source))
+            patch(base_path=dest_path, patch_file=patch_file)
+
 
 def rename(pattern, name):
     for extracted in glob.glob(pattern):
@@ -17,10 +27,11 @@ class OgreConan(ConanFile):
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False]}
-    default_options = "shared=False"
-    exports = ["CMakeLists.txt"]
+    default_options = "shared=False", "freetype:shared=True"
+    exports = ["CMakeLists.txt", 'patches*']
     requires = (
         #"freeimage/3.17.0@sixten-hilborn/testing",
+        "Boost/1.60.0@lasote/stable",
         "freetype/2.6.3@sixten-hilborn/testing",
         "SDL2/2.0.5@lasote/stable",
         "OIS/1.3@sixten-hilborn/testing",
@@ -33,6 +44,7 @@ class OgreConan(ConanFile):
     def source(self):
         get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
         rename('sinbad-ogre*', self.folder)
+        apply_patches('patches', self.folder)
 
     def build(self):
         self.makedir('_build')
@@ -50,12 +62,16 @@ class OgreConan(ConanFile):
             self.run("mkdir {0}".format(path))
 
     def package(self):
-        lib_dir = "_build/{0}/lib".format(self.folder)
-        bin_dir = "_build/{0}/bin".format(self.folder)
+        if self.settings.compiler == "Visual Studio":
+            lib_dir = "_build/lib"
+            bin_dir = "_build/bin"
+        else:
+            lib_dir = "_build/{0}/lib".format(self.folder)
+            bin_dir = "_build/{0}/bin".format(self.folder)
         self.copy(pattern="*.h", dst="include/OGRE", src="_build/{0}//include".format(self.folder))
         self.copy(pattern="*.h", dst="include/OGRE", src="{0}/OgreMain/include".format(self.folder))
         #for subsystem in ['RenderSystems',
-        #self.copy(pattern="*.h", dst="include/OGRE", src="{0}/OgreMain/include".format(self.folder), keep_path=False)
+        #self.copy(pattern="*.h", dst="include/OGRE", src="{0}/OgreMain/include".format(self.folder))
         self.copy("*.lib", dst="lib", src=lib_dir, keep_path=False)
         self.copy("*.a", dst="lib", src=lib_dir, keep_path=False)
         self.copy("*.so", dst="lib", src=lib_dir, keep_path=False)
