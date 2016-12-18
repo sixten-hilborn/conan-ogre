@@ -40,6 +40,7 @@ class OgreConan(ConanFile):
         "OIS/1.3@sixten-hilborn/testing",
         "RapidJSON/1.0.2@SamuelMarks/stable",
         "zlib/1.2.8@lasote/stable",
+        "Cg/3.1@sixten-hilborn/testing",
 
         "libpng/1.6.23@lasote/stable", "bzip2/1.0.6@lasote/stable"  # From freetype
     )
