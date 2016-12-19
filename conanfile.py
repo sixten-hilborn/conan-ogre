@@ -34,7 +34,7 @@ class OgreConan(ConanFile):
     default_options = "shared=True", "use_boost=True", "freetype:shared=False"
     exports = ["CMakeLists.txt", 'patches*']
     requires = (
-        #"freeimage/3.17.0@sixten-hilborn/testing",
+        "freeimage/3.17.0@sixten-hilborn/testing",
         "freetype/2.6.3@sixten-hilborn/testing",
         "SDL2/2.0.5@lasote/stable",
         "OIS/1.3@sixten-hilborn/testing",
