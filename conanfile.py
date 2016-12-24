@@ -25,6 +25,7 @@ class OgreConan(ConanFile):
     version = "1.9.0"
     description = "Open Source 3D Graphics Engine"
     folder = 'ogre-v1.9'
+    install_path = os.path.join('_build', folder, 'sdk')
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     options = {
@@ -69,8 +70,15 @@ class OgreConan(ConanFile):
         self.makedir('_build')
         cmake = CMake(self.settings)
         cd_build = 'cd _build'
-        options = '-DOGRE_BUILD_SAMPLES=0 -DOGRE_BUILD_TESTS=0 -DOGRE_BUILD_TOOLS=0 -DOGRE_INSTALL_PDB=0 -DOGRE_USE_BOOST={0}'.format(
-            1 if self.options.use_boost else 0)
+        options = (
+            '-DOGRE_BUILD_SAMPLES=0 '
+            '-DOGRE_BUILD_TESTS=0 '
+            '-DOGRE_BUILD_TOOLS=0 '
+            '-DOGRE_INSTALL_PDB=0 '
+            '-DOGRE_USE_BOOST={0} '
+            '-DCMAKE_INSTALL_PREFIX={1}').format(
+            1 if self.options.use_boost else 0,
+            os.path.join(os.getcwd(), self.install_path))
         build_options = '-- -j{0}'.format(cpu_count()) if self.settings.compiler == 'gcc' else ''
         self.run_and_print('%s && cmake .. %s %s' % (cd_build, cmake.command_line, options))
         self.run_and_print("%s && cmake --build . --target install %s %s" % (cd_build, cmake.build_config, build_options))
@@ -82,7 +90,7 @@ class OgreConan(ConanFile):
             self.run("mkdir {0}".format(path))
 
     def package(self):
-        sdk_dir = os.path.join('_build', self.folder, 'sdk')
+        sdk_dir = self.install_path
         include_dir = os.path.join(sdk_dir, 'include', 'OGRE')
         lib_dir = os.path.join(sdk_dir, 'lib')
         bin_dir = os.path.join(sdk_dir, 'bin')
