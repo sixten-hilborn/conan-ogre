@@ -32,7 +32,7 @@ class OgreConan(ConanFile):
         "shared": [True, False],
         "use_boost": [True, False],
     }
-    default_options = "shared=True", "use_boost=True", "freetype:shared=False"
+    default_options = "shared=True", "use_boost=True", "freetype:shared=False", "Boost:fPIC=True"
     exports = ["CMakeLists.txt", 'patches*']
     requires = (
         "freeimage/3.17.0@hilborn/stable",
@@ -56,6 +56,10 @@ class OgreConan(ConanFile):
     def requirements(self):
         if self.options.use_boost:
             self.requires("Boost/1.60.0@lasote/stable")
+
+    def system_requirements(self):
+        if self.settings.os == 'Linux':
+            self.run_and_print("sudo apt-get install -y libxaw7-dev libxt-dev")
 
     def source(self):
         get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
