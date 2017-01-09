@@ -101,7 +101,7 @@ class OgreConan(ConanFile):
         self.copy(pattern="*.h", dst="include/OGRE", src=include_dir)
         self.copy("*.lib", dst="lib", src=lib_dir, keep_path=False)
         self.copy("*.a", dst="lib", src=lib_dir, keep_path=False)
-        self.copy("*.so", dst="lib", src=lib_dir, keep_path=False)
+        self.copy("*.so*", dst="lib", src=lib_dir, keep_path=False, links=True)
         self.copy("*.dll", dst="bin", src=bin_dir, keep_path=False)
 
     def package_info(self):
