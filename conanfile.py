@@ -2,9 +2,8 @@ from conans import ConanFile
 import os
 import fnmatch
 import glob
-from conans.tools import get, patch, replace_in_file
+from conans.tools import cpu_count, get, patch, replace_in_file, SystemPackageTool
 from conans import CMake
-from multiprocessing import cpu_count
 
 
 def apply_patches(source, dest):
@@ -54,7 +53,10 @@ class OgreConan(ConanFile):
 
     def system_requirements(self):
         if self.settings.os == 'Linux':
-            self.run_and_print("sudo apt-get install -y libxaw7-dev libxt-dev")
+            installer = SystemPackageTool()
+            installer.update()
+            installer.install("libxaw7-dev")
+            installer.install("libxt-dev")
 
     def source(self):
         get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
