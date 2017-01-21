@@ -31,7 +31,7 @@ class OgreConan(ConanFile):
         "shared": [True, False],
         "use_boost": [True, False],
     }
-    default_options = "shared=True", "use_boost=True", "freetype:shared=False", "Boost:fPIC=True"
+    default_options = "shared=True", "use_boost=True", "freetype:shared=False"
     exports = ["CMakeLists.txt", 'patches*']
     requires = (
         "freeimage/3.17.0@hilborn/stable",
@@ -49,6 +49,8 @@ class OgreConan(ConanFile):
 
     def requirements(self):
         if self.options.use_boost:
+            if self.compiler != "Visual Studio":
+                self.options["Boost"].fPIC = True
             self.requires("Boost/1.60.0@lasote/stable")
 
     def system_requirements(self):
