@@ -48,11 +48,6 @@ class OgreConan(ConanFile):
     url = "http://github.com/sixten-hilborn/conan-ogre"
     license = "https://opensource.org/licenses/mit-license.php"
 
-    def configure(self):
-        if self.settings.compiler == "Visual Studio" and self.settings.build_type == "Debug":
-            if not self.settings.compiler.runtime.value.endswith("d"):
-                self.settings.compiler.runtime.value += "d"
-
     def requirements(self):
         if self.options.use_boost:
             self.requires("Boost/1.60.0@lasote/stable")
