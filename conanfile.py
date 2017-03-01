@@ -59,6 +59,7 @@ class OgreConan(ConanFile):
             installer.update()
             installer.install("libxaw7-dev")
             installer.install("libxt-dev")
+            installer.install("libxrandr-dev")
 
     def source(self):
         get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
