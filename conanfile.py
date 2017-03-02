@@ -56,10 +56,14 @@ class OgreConan(ConanFile):
     def system_requirements(self):
         if self.settings.os == 'Linux':
             installer = SystemPackageTool()
-            installer.update()
-            installer.install("libxaw7-dev")
-            installer.install("libxt-dev")
-            installer.install("libxrandr-dev")
+            if self.settings.arch == 'x86':
+                installer.install("libxaw7-dev:i386")
+                installer.install("libxt-dev:i386")
+                installer.install("libxrandr-dev:i386")
+            elif self.settings.arch == 'x86_64':
+                installer.install("libxaw7-dev:amd64")
+                installer.install("libxt-dev:amd64")
+                installer.install("libxrandr-dev:amd64")
 
     def source(self):
         get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
