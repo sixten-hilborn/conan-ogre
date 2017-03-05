@@ -40,9 +40,7 @@ class OgreConan(ConanFile):
         "OIS/1.3@hilborn/stable",
         "RapidJSON/1.0.2@inexorgame/stable",
         "zlib/1.2.8@lasote/stable",
-        "Cg/3.1@hilborn/stable",
-
-        "libpng/1.6.23@lasote/stable", "bzip2/1.0.6@lasote/stable"  # From freetype
+        "Cg/3.1@hilborn/stable"
     )
     url = "http://github.com/sixten-hilborn/conan-ogre"
     license = "https://opensource.org/licenses/mit-license.php"
