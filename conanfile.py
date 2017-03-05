@@ -77,27 +77,21 @@ class OgreConan(ConanFile):
             'target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES} ${CONAN_LIBS_BZIP2} ${CONAN_LIBS_LIBPNG} ${CONAN_LIBS_ZLIB})')
 
     def build(self):
-        self.makedir('_build')
         cmake = CMake(self.settings)
-        cd_build = 'cd _build'
-        options = (
-            '-DOGRE_BUILD_SAMPLES=0 '
-            '-DOGRE_BUILD_TESTS=0 '
-            '-DOGRE_BUILD_TOOLS=0 '
-            '-DOGRE_INSTALL_PDB=0 '
-            '-DOGRE_USE_BOOST={0} '
-            '-DCMAKE_INSTALL_PREFIX={1}').format(
-            1 if self.options.use_boost else 0,
-            os.path.join(os.getcwd(), self.install_path))
-        build_options = '-- -j{0}'.format(cpu_count()) if self.settings.compiler == 'gcc' else ''
-        self.run_and_print('%s && cmake .. %s %s' % (cd_build, cmake.command_line, options))
-        self.run_and_print("%s && cmake --build . --target install %s %s" % (cd_build, cmake.build_config, build_options))
+        options = {
+            'OGRE_BUILD_SAMPLES': False,
+            'OGRE_BUILD_TESTS': False,
+            'OGRE_BUILD_TOOLS': False,
+            'OGRE_INSTALL_PDB': False,
+            'OGRE_USE_BOOST': self.options.use_boost,
+            'CMAKE_INSTALL_PREFIX:': os.path.join(os.getcwd(), self.install_path)
+        }
+        cmake.configure(self, defs=options, build_dir='_build')
 
-    def makedir(self, path):
-        if self.settings.os == "Windows":
-            self.run("IF not exist {0} mkdir {0}".format(path))
-        else:
-            self.run("mkdir {0}".format(path))
+        build_args = ['--']
+        if self.settings.compiler == 'gcc':
+            build_args.append('-- -j{0}'.format(cpu_count()))
+        cmake.build(self, target='install', args=build_args)
 
     def package(self):
         sdk_dir = self.install_path
