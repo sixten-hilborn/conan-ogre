@@ -38,7 +38,7 @@ class OgreConan(ConanFile):
         "freetype/2.6.3@hilborn/stable",
         "SDL2/2.0.5@lasote/stable",
         "OIS/1.3@hilborn/stable",
-        "RapidJSON/1.0.2@SamuelMarks/stable",
+        "RapidJSON/1.0.2@inexorgame/stable",
         "zlib/1.2.8@lasote/stable",
         "Cg/3.1@hilborn/stable",
 
