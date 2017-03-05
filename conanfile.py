@@ -57,10 +57,12 @@ class OgreConan(ConanFile):
         if self.settings.os == 'Linux':
             installer = SystemPackageTool()
             if self.settings.arch == 'x86':
+                installer.install("libxmu-dev:i386")
                 installer.install("libxaw7-dev:i386")
                 installer.install("libxt-dev:i386")
                 installer.install("libxrandr-dev:i386")
             elif self.settings.arch == 'x86_64':
+                installer.install("libxmu-dev:amd64")
                 installer.install("libxaw7-dev:amd64")
                 installer.install("libxt-dev:amd64")
                 installer.install("libxrandr-dev:amd64")
