@@ -90,7 +90,7 @@ class OgreConan(ConanFile):
 
         build_args = ['--']
         if self.settings.compiler == 'gcc':
-            build_args.append('-- -j{0}'.format(cpu_count()))
+            build_args.append('-j{0}'.format(cpu_count()))
         cmake.build(self, target='install', args=build_args)
 
     def package(self):
