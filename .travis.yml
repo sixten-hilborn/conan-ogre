@@ -23,15 +23,7 @@ env:
 matrix:
    include:
        - os: osx
-         osx_image: xcode8.2
-         language: generic
-         env:
-       - os: osx
-         osx_image: xcode8.1
-         language: generic
-         env:
-       - os: osx
-         osx_image: xcode8
+         osx_image: xcode8 # apple-clang 8.0
          language: generic
          env:
        - os: osx
