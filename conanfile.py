@@ -30,25 +30,36 @@ class OgreConan(ConanFile):
     options = {
         "shared": [True, False],
         "with_boost": [True, False],
+        "with_cg": [True, False],
     }
-    default_options = "shared=True", "with_boost=True", "freetype:shared=False"
+    default_options = (
+        "shared=True",
+        "with_boost=True",
+        "with_cg=True",
+        "freetype:shared=False"
+    )
     exports = ["CMakeLists.txt", 'patches*']
     requires = (
         "freeimage/3.17.0@hilborn/stable",
         "freetype/2.6.3@hilborn/stable",
         "SDL2/2.0.5@lasote/stable",
         "RapidJSON/1.0.2@inexorgame/stable",
-        "zlib/1.2.8@lasote/stable",
-        "Cg/3.1@hilborn/stable"
+        "zlib/1.2.8@lasote/stable"
     )
     url = "http://github.com/sixten-hilborn/conan-ogre"
     license = "https://opensource.org/licenses/mit-license.php"
+
+    def configure(self):
+        if 'x86' not in str(self.settings.arch):
+            self.options.with_cg = False
 
     def requirements(self):
         if self.options.with_boost:
             if self.settings.compiler != "Visual Studio":
                 self.options["Boost"].fPIC = True
             self.requires("Boost/1.60.0@lasote/stable")
+        if self.options.with_cg:
+            self.requires("Cg/3.1@hilborn/stable")
 
     def system_requirements(self):
         if self.settings.os == 'Linux':
