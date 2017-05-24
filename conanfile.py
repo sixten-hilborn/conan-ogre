@@ -42,8 +42,6 @@ class OgreConan(ConanFile):
     requires = (
         "freeimage/3.17.0@hilborn/stable",
         "freetype/2.6.3@hilborn/stable",
-        "SDL2/2.0.5@lasote/stable",
-        "RapidJSON/1.0.2@inexorgame/stable",
         "zlib/1.2.8@lasote/stable"
     )
     url = "http://github.com/sixten-hilborn/conan-ogre"
