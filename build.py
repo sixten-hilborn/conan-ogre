@@ -8,8 +8,8 @@ if __name__ == "__main__":
     # Disable VS2010 because of missing DirectX stuff
     # Disable x86 Linux builds
     builder.builds = [
-        [settings, options]
-        for settings, options in builder.builds
+        [settings, options, env_vars, build_requires]
+        for settings, options, env_vars, build_requires in builder.builds
         if not (settings["compiler"] == "Visual Studio" and settings["compiler.version"] == "10")
         and not (os_info.is_linux and settings["arch"] == "x86")
     ]
