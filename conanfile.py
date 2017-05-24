@@ -29,9 +29,9 @@ class OgreConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
-        "use_boost": [True, False],
+        "with_boost": [True, False],
     }
-    default_options = "shared=True", "use_boost=True", "freetype:shared=False"
+    default_options = "shared=True", "with_boost=True", "freetype:shared=False"
     exports = ["CMakeLists.txt", 'patches*']
     requires = (
         "freeimage/3.17.0@hilborn/stable",
@@ -45,7 +45,7 @@ class OgreConan(ConanFile):
     license = "https://opensource.org/licenses/mit-license.php"
 
     def requirements(self):
-        if self.options.use_boost:
+        if self.options.with_boost:
             if self.settings.compiler != "Visual Studio":
                 self.options["Boost"].fPIC = True
             self.requires("Boost/1.60.0@lasote/stable")
@@ -79,7 +79,7 @@ class OgreConan(ConanFile):
             'OGRE_BUILD_TESTS': False,
             'OGRE_BUILD_TOOLS': False,
             'OGRE_INSTALL_PDB': False,
-            'OGRE_USE_BOOST': self.options.use_boost,
+            'OGRE_USE_BOOST': self.options.with_boost,
             'CMAKE_INSTALL_PREFIX:': os.path.join(os.getcwd(), self.install_path)
         }
         cmake.configure(defs=options, build_dir='_build')
