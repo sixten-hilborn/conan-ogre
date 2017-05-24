@@ -37,7 +37,6 @@ class OgreConan(ConanFile):
         "freeimage/3.17.0@hilborn/stable",
         "freetype/2.6.3@hilborn/stable",
         "SDL2/2.0.5@lasote/stable",
-        "OIS/1.3@hilborn/stable",
         "RapidJSON/1.0.2@inexorgame/stable",
         "zlib/1.2.8@lasote/stable",
         "Cg/3.1@hilborn/stable"
@@ -77,7 +76,6 @@ class OgreConan(ConanFile):
     def build(self):
         cmake = CMake(self)
         options = {
-            'OGRE_BUILD_SAMPLES': False,
             'OGRE_BUILD_TESTS': False,
             'OGRE_BUILD_TOOLS': False,
             'OGRE_INSTALL_PDB': False,
