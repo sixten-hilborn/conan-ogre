@@ -2,12 +2,12 @@ from conans import ConanFile
 import os
 import fnmatch
 import glob
-from conans.tools import cpu_count, get, patch, replace_in_file, SystemPackageTool
+from conans.tools import get, patch, replace_in_file, SystemPackageTool
 from conans import CMake
 
 
 def apply_patches(source, dest):
-    for root, dirnames, filenames in os.walk(source):
+    for root, _dirnames, filenames in os.walk(source):
         for filename in fnmatch.filter(filenames, '*.patch'):
             patch_file = os.path.join(root, filename)
             dest_path = os.path.join(dest, os.path.relpath(root, source))
@@ -75,7 +75,7 @@ class OgreConan(ConanFile):
             'target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES} ${CONAN_LIBS_BZIP2} ${CONAN_LIBS_LIBPNG} ${CONAN_LIBS_ZLIB})')
 
     def build(self):
-        cmake = CMake(self.settings)
+        cmake = CMake(self)
         options = {
             'OGRE_BUILD_SAMPLES': False,
             'OGRE_BUILD_TESTS': False,
@@ -84,12 +84,8 @@ class OgreConan(ConanFile):
             'OGRE_USE_BOOST': self.options.use_boost,
             'CMAKE_INSTALL_PREFIX:': os.path.join(os.getcwd(), self.install_path)
         }
-        cmake.configure(self, defs=options, build_dir='_build')
-
-        build_args = ['--']
-        if self.settings.compiler == 'gcc':
-            build_args.append('-j{0}'.format(cpu_count()))
-        cmake.build(self, target='install', args=build_args)
+        cmake.configure(defs=options, build_dir='_build')
+        cmake.build(target='install')
 
     def package(self):
         sdk_dir = self.install_path
@@ -115,4 +111,4 @@ class OgreConan(ConanFile):
 
         is_apple = (self.settings.os == 'Macos' or self.settings.os == 'iOS')
         if self.settings.build_type == "Debug" and not is_apple:
-                self.cpp_info.libs = [lib+'_d' for lib in self.cpp_info.libs]
+            self.cpp_info.libs = [lib+'_d' for lib in self.cpp_info.libs]
