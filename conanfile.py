@@ -74,13 +74,18 @@ class OgreConan(ConanFile):
     def source(self):
         tools.get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
         rename('sinbad-ogre*', self.folder)
+
+    def build(self):
         apply_patches('patches', self.folder)
+        tools.replace_in_file(
+            '{0}/OgreMain/CMakeLists.txt'.format(self.folder),
+            'target_link_libraries(OgreMain ${LIBRARIES})',
+            'target_link_libraries(OgreMain ${LIBRARIES} ${CONAN_LIBS_ZLIB})')
         tools.replace_in_file(
             '{0}/Components/Overlay/CMakeLists.txt'.format(self.folder),
             'target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES})',
-            'target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES} ${CONAN_LIBS_BZIP2} ${CONAN_LIBS_LIBPNG} ${CONAN_LIBS_ZLIB})')
+            'target_link_libraries(OgreOverlay OgreMain ${CONAN_LIBS_FREETYPE} ${CONAN_LIBS_BZIP2} ${CONAN_LIBS_LIBPNG} ${CONAN_LIBS_ZLIB})')
 
-    def build(self):
         cmake = CMake(self)
         options = {
             'OGRE_BUILD_TESTS': False,
