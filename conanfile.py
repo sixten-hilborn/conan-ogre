@@ -1,9 +1,7 @@
-from conans import ConanFile
+from conans import ConanFile, CMake, tools
 import os
 import fnmatch
 import glob
-from conans.tools import get, patch, replace_in_file, SystemPackageTool
-from conans import CMake
 
 
 def apply_patches(source, dest):
@@ -11,7 +9,7 @@ def apply_patches(source, dest):
         for filename in fnmatch.filter(filenames, '*.patch'):
             patch_file = os.path.join(root, filename)
             dest_path = os.path.join(dest, os.path.relpath(root, source))
-            patch(base_path=dest_path, patch_file=patch_file)
+            tools.patch(base_path=dest_path, patch_file=patch_file)
 
 
 def rename(pattern, name):
@@ -40,9 +38,9 @@ class OgreConan(ConanFile):
     )
     exports = ["CMakeLists.txt", 'patches*']
     requires = (
-        "freeimage/3.17.0@hilborn/stable",
-        "freetype/2.6.3@hilborn/stable",
-        "zlib/1.2.8@lasote/stable"
+        "freeimage/[>=3.17.0]@sixten-hilborn/stable",
+        "freetype/[>=2.8.1]@bincrafters/stable",
+        "zlib/1.2.11@conan/stable"
     )
     url = "http://github.com/sixten-hilborn/conan-ogre"
     license = "https://opensource.org/licenses/mit-license.php"
@@ -54,14 +52,14 @@ class OgreConan(ConanFile):
     def requirements(self):
         if self.options.with_boost:
             if self.settings.compiler != "Visual Studio":
-                self.options["Boost"].fPIC = True
-            self.requires("Boost/1.60.0@lasote/stable")
+                self.options["boost"].fPIC = True
+            self.requires("boost/1.67.0@conan/stable")
         if self.options.with_cg:
             self.requires("Cg/3.1@hilborn/stable")
 
     def system_requirements(self):
         if self.settings.os == 'Linux':
-            installer = SystemPackageTool()
+            installer = tools.SystemPackageTool()
             if self.settings.arch == 'x86':
                 installer.install("libxmu-dev:i386")
                 installer.install("libxaw7-dev:i386")
@@ -74,10 +72,10 @@ class OgreConan(ConanFile):
                 installer.install("libxrandr-dev:amd64")
 
     def source(self):
-        get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
+        tools.get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
         rename('sinbad-ogre*', self.folder)
         apply_patches('patches', self.folder)
-        replace_in_file(
+        tools.replace_in_file(
             '{0}/Components/Overlay/CMakeLists.txt'.format(self.folder),
             'target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES})',
             'target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES} ${CONAN_LIBS_BZIP2} ${CONAN_LIBS_LIBPNG} ${CONAN_LIBS_ZLIB})')
