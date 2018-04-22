@@ -55,7 +55,7 @@ class OgreConan(ConanFile):
                 self.options["boost"].fPIC = True
             self.requires("boost/1.67.0@conan/stable")
         if self.options.with_cg:
-            self.requires("Cg/3.1@hilborn/stable")
+            self.requires("Cg/3.1@sixten-hilborn/stable")
 
     def system_requirements(self):
         if self.settings.os == 'Linux':
