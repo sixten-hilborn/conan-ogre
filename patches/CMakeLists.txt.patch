@@ -1,6 +1,11 @@
---- CMakeLists.txt	2017-03-06 21:09:17.723948700 +0100
-+++ CMakeLists.txt	2017-03-06 21:06:21.063515700 +0100
-@@ -47,6 +47,7 @@
+--- CMakeLists.txt	2018-04-24 22:08:34.861084700 +0200
++++ CMakeLists.txt	2018-04-24 22:54:35.961230900 +0200
+@@ -48,9 +48,12 @@
+ endif ()
+ 
+ project(OGRE)
++include(../conanbuildinfo.cmake)
++CONAN_BASIC_SETUP()
  
  # Include necessary submodules
  set(CMAKE_MODULE_PATH
@@ -8,7 +13,7 @@
    "${OGRE_SOURCE_DIR}/CMake"
    "${OGRE_SOURCE_DIR}/CMake/Utils"
    "${OGRE_SOURCE_DIR}/CMake/Packages"
-@@ -114,12 +115,10 @@
+@@ -128,12 +131,10 @@
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
    # Enable intrinsics on MSVC in debug mode
    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
@@ -19,6 +24,6 @@
  	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
  	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /bigobj")
 -  endif ()
-   if (OGRE_UNITY_BUILD)
-     # object files can get large with Unity builds
-     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+ 
+   if (OGRE_PROJECT_FOLDERS)  
+     # Turn on the ability to create folders to organize projects (.vcproj)

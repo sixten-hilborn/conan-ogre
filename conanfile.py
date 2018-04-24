@@ -18,10 +18,10 @@ def rename(pattern, name):
 
 
 class OgreConan(ConanFile):
-    name = "OGRE"
-    version = "1.9.0"
+    name = "ogre"
+    version = "1.10.11"
     description = "Open Source 3D Graphics Engine"
-    folder = 'ogre-v1.9'
+    folder = 'ogre-v' + version
     install_path = os.path.join('_build', folder, 'sdk')
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
@@ -32,11 +32,11 @@ class OgreConan(ConanFile):
     }
     default_options = (
         "shared=True",
-        "with_boost=True",
+        "with_boost=False",
         "with_cg=True",
         "freetype:shared=False"
     )
-    exports = ["CMakeLists.txt", 'patches*']
+    exports_sources = ['patches*']
     requires = (
         "freeimage/[>=3.17.0]@sixten-hilborn/stable",
         "freetype/[>=2.8.1]@bincrafters/stable",
@@ -72,7 +72,7 @@ class OgreConan(ConanFile):
                 installer.install("libxrandr-dev:amd64")
 
     def source(self):
-        tools.get("https://bitbucket.org/sinbad/ogre/get/v1-9.zip")
+        tools.get("https://bitbucket.org/sinbad/ogre/get/v{0}.zip".format(self.version.replace('.', '-')))
         rename('sinbad-ogre*', self.folder)
 
     def build(self):
@@ -87,14 +87,21 @@ class OgreConan(ConanFile):
             'target_link_libraries(OgreOverlay OgreMain ${CONAN_LIBS_FREETYPE} ${CONAN_LIBS_BZIP2} ${CONAN_LIBS_LIBPNG} ${CONAN_LIBS_ZLIB})')
 
         cmake = CMake(self)
-        options = {
-            'OGRE_BUILD_TESTS': False,
-            'OGRE_BUILD_TOOLS': False,
-            'OGRE_INSTALL_PDB': False,
-            'OGRE_USE_BOOST': self.options.with_boost,
-            'CMAKE_INSTALL_PREFIX:': os.path.join(os.getcwd(), self.install_path)
-        }
-        cmake.configure(defs=options, build_dir='_build')
+        cmake.definitions['CMAKE_INSTALL_PREFIX'] = os.path.join(os.getcwd(), self.install_path)
+        cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = True
+        cmake.definitions['OGRE_STATIC'] = not self.options.shared
+        cmake.definitions['OGRE_COPY_DEPENDENCIES'] = False
+        #cmake.definitions['OGRE_UNITY_BUILD'] = True  # Speed up build
+        cmake.definitions['OGRE_BUILD_DEPENDENCIES'] = False  # Dependencies should be handled via Conan instead :)
+        cmake.definitions['OGRE_BUILD_SAMPLES'] = False
+        cmake.definitions['OGRE_BUILD_TESTS'] = False
+        cmake.definitions['OGRE_BUILD_TOOLS'] = False
+        cmake.definitions['OGRE_INSTALL_PDB'] = False
+        cmake.definitions['OGRE_USE_STD11'] = True
+        cmake.definitions['OGRE_NODE_STORAGE_LEGACY'] = False
+        if self.settings.compiler == 'Visual Studio':
+            cmake.definitions['OGRE_CONFIG_STATIC_LINK_CRT'] = str(self.settings.compiler.runtime).startswith('MT')
+        cmake.configure(build_folder='_build', source_folder=self.folder)
         cmake.build(target='install')
 
     def package(self):
