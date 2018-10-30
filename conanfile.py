@@ -29,12 +29,14 @@ class OgreConan(ConanFile):
         "shared": [True, False],
         "with_boost": [True, False],
         "with_cg": [True, False],
+        "node_storage_legacy": [True, False],
     }
     default_options = (
         "shared=True",
         "with_boost=False",
         "with_cg=True",
-        "freetype:shared=False"
+        "freetype:shared=False",
+        "node_storage_legacy=True",
     )
     exports_sources = ['patches*']
     requires = (
@@ -91,14 +93,14 @@ class OgreConan(ConanFile):
         cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = True
         cmake.definitions['OGRE_STATIC'] = not self.options.shared
         cmake.definitions['OGRE_COPY_DEPENDENCIES'] = False
-        #cmake.definitions['OGRE_UNITY_BUILD'] = True  # Speed up build
+        # cmake.definitions['OGRE_UNITY_BUILD'] = True  # Speed up build
         cmake.definitions['OGRE_BUILD_DEPENDENCIES'] = False  # Dependencies should be handled via Conan instead :)
         cmake.definitions['OGRE_BUILD_SAMPLES'] = False
         cmake.definitions['OGRE_BUILD_TESTS'] = False
         cmake.definitions['OGRE_BUILD_TOOLS'] = False
         cmake.definitions['OGRE_INSTALL_PDB'] = False
         cmake.definitions['OGRE_USE_STD11'] = True
-        cmake.definitions['OGRE_NODE_STORAGE_LEGACY'] = False
+        cmake.definitions['OGRE_NODE_STORAGE_LEGACY'] = self.options.node_storage_legacy
         if self.settings.compiler == 'Visual Studio':
             cmake.definitions['OGRE_CONFIG_STATIC_LINK_CRT'] = str(self.settings.compiler.runtime).startswith('MT')
         cmake.configure(build_folder='_build', source_folder=self.folder)
