@@ -75,7 +75,7 @@ class OgreConan(ConanFile):
                 installer.install("libxrandr-dev:amd64")
 
     def source(self):
-        tools.get("https://github.com/OGRECave/ogre/archive/v{0}.zip".format(self.version))
+        tools.get("https://github.com/OGRECave/ogre/archive/v{0}.zip".format(self.version), sha256='43ddecf937191aae46acfb6bf73ef107b7366b0336bf0cfe49dea4b1bfc24ed9')
         rename('ogre-*', self.folder)
 
     def build(self):
