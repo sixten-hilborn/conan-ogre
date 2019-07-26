@@ -40,8 +40,9 @@ class OgreConan(ConanFile):
     )
     exports_sources = ['patches*']
     requires = (
-        "freeimage/[>=3.17.0]@sixten-hilborn/stable",
-        "freetype/[>=2.8.1]@bincrafters/stable",
+        "freeimage/3.18.0@sixten-hilborn/stable",
+        "freetype/2.9.0@bincrafters/stable",
+        "libpng/1.6.37@bincrafters/stable",  # override freetype's libpng
         "zlib/1.2.11@conan/stable"
     )
     url = "http://github.com/sixten-hilborn/conan-ogre"
