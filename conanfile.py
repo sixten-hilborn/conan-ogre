@@ -48,6 +48,8 @@ class OgreConan(ConanFile):
     url = "http://github.com/sixten-hilborn/conan-ogre"
     license = "https://opensource.org/licenses/mit-license.php"
 
+    short_paths = True
+
     def configure(self):
         if 'x86' not in str(self.settings.arch):
             self.options.with_cg = False
