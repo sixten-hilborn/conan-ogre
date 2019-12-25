@@ -132,8 +132,8 @@ class OgreConan(ConanFile):
         ]
         if not self.options.shared and self.settings.os == 'Windows':
             self.cpp_info.libs = [lib+'Static' for lib in self.cpp_info.libs]
-        is_apple = (self.settings.os == 'Macos' or self.settings.os == 'iOS')
-        if self.settings.build_type == "Debug" and not is_apple:
+        #is_apple = (self.settings.os == 'Macos' or self.settings.os == 'iOS')
+        if self.settings.build_type == "Debug" and self.settings.os == 'Windows': #not is_apple:
             self.cpp_info.libs = [lib+'_d' for lib in self.cpp_info.libs]
 
         if self.settings.os == 'Linux':
