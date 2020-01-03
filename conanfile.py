@@ -41,7 +41,7 @@ class OgreConan(ConanFile):
     exports_sources = ['patches*']
     requires = (
         "freeimage/3.18.0@sixten-hilborn/stable",
-        "freetype/2.9.0@bincrafters/stable",
+        "freetype/2.10.1",
         "libpng/1.6.37",  # override freetype's libpng
         "zlib/1.2.11"
     )
