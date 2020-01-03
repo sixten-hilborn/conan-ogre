@@ -103,6 +103,7 @@ class OgreConan(ConanFile):
         cmake.definitions['OGRE_BUILD_TOOLS'] = False
         cmake.definitions['OGRE_INSTALL_PDB'] = False
         cmake.definitions['OGRE_USE_STD11'] = True
+        cmake.definitions['OGRE_USE_BOOST'] = self.options.with_boost
         cmake.definitions['OGRE_NODE_STORAGE_LEGACY'] = self.options.node_storage_legacy
         if self.settings.compiler == 'Visual Studio':
             cmake.definitions['OGRE_CONFIG_STATIC_LINK_CRT'] = str(self.settings.compiler.runtime).startswith('MT')
