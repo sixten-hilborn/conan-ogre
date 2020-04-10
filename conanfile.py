@@ -30,14 +30,24 @@ class OgreConan(ConanFile):
         "with_boost": [True, False],
         "with_cg": [True, False],
         "node_storage_legacy": [True, False],
+        "with_rendersystem_d3d9": [True, False],
+        "with_rendersystem_d3d11": [True, False],
+        "with_rendersystem_gl3plus": [True, False],
+        "with_rendersystem_gl": [True, False],
+        "with_rendersystem_gles": [True, False],
+        "with_rendersystem_gles2": [True, False],
     }
-    default_options = (
-        "shared=True",
-        "with_boost=False",
-        "with_cg=True",
-        "freetype:shared=False",
-        "node_storage_legacy=True",
-    )
+    default_options = {
+        "shared": True,
+        "with_boost": False,
+        "with_cg": True,
+        "freetype:shared": False,
+        "node_storage_legacy": True,
+        "with_rendersystem_gl3plus": True,
+        "with_rendersystem_gl": True,
+        "with_rendersystem_gles": False,
+        "with_rendersystem_gles2": False,
+    }
     exports_sources = ['patches*']
     requires = (
         "freeimage/3.18.0@sixten-hilborn/stable",
@@ -49,6 +59,17 @@ class OgreConan(ConanFile):
     license = "https://opensource.org/licenses/mit-license.php"
 
     short_paths = True
+    
+    def config_options(self):
+        if self.options.with_rendersystem_d3d9 == None:
+            self.options.with_rendersystem_d3d9 = False
+
+        if self.settings.os == 'Windows':
+            if self.options.with_rendersystem_d3d11 == None:
+                self.options.with_rendersystem_d3d11 = True
+        else:
+            if self.options.with_rendersystem_d3d11 == None:
+                self.options.with_rendersystem_d3d11 = False
 
     def configure(self):
         if 'x86' not in str(self.settings.arch):
@@ -105,6 +126,12 @@ class OgreConan(ConanFile):
         cmake.definitions['OGRE_USE_STD11'] = True
         cmake.definitions['OGRE_USE_BOOST'] = self.options.with_boost
         cmake.definitions['OGRE_NODE_STORAGE_LEGACY'] = self.options.node_storage_legacy
+        cmake.definitions['OGRE_BUILD_RENDERSYSTEM_D3D9'] = self.options.with_rendersystem_d3d9
+        cmake.definitions['OGRE_BUILD_RENDERSYSTEM_D3D11'] = self.options.with_rendersystem_d3d11
+        cmake.definitions['OGRE_BUILD_RENDERSYSTEM_GL3PLUS'] = self.options.with_rendersystem_gl3plus
+        cmake.definitions['OGRE_BUILD_RENDERSYSTEM_GL'] = self.options.with_rendersystem_gl
+        cmake.definitions['OGRE_BUILD_RENDERSYSTEM_GLES'] = self.options.with_rendersystem_gles
+        cmake.definitions['OGRE_BUILD_RENDERSYSTEM_GLES2'] = self.options.with_rendersystem_gles2
         if self.settings.compiler == 'Visual Studio':
             cmake.definitions['OGRE_CONFIG_STATIC_LINK_CRT'] = str(self.settings.compiler.runtime).startswith('MT')
         cmake.configure(build_folder='_build', source_folder=self.folder)
