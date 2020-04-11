@@ -115,6 +115,10 @@ class OgreConan(ConanFile):
             'target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES})',
             'target_link_libraries(OgreOverlay OgreMain ${CONAN_LIBS_FREETYPE} ${CONAN_LIBS_BZIP2} ${CONAN_LIBS_LIBPNG} ${CONAN_LIBS_ZLIB})')
 
+        # Fix for static build without DirectX 9
+        if not self.options.with_rendersystem_d3d9:
+            tools.replace_in_file('{0}/Components/Bites/CMakeLists.txt'.format(self.folder), ' ${DirectX9_INCLUDE_DIR}', '')
+
         cmake = CMake(self)
         cmake.definitions['CMAKE_INSTALL_PREFIX'] = os.path.join(os.getcwd(), self.install_path)
         cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = True
