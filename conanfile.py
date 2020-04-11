@@ -83,19 +83,22 @@ class OgreConan(ConanFile):
         if self.options.with_cg:
             self.requires("Cg/3.1@sixten-hilborn/stable")
 
+    def build_requirements(self):
+        if self.settings.os == 'Linux':
+            installer = tools.SystemPackageTool(conanfile=self)
+            if self.options.with_rendersystem_gl or self.options.with_rendersystem_gl3plus:
+                installer.install('libgl1-mesa-dev')
+                installer.install('libglu1-mesa-dev')
+            if self.options.with_rendersystem_gles2:
+                installer.install('libgles2-mesa-dev')
+
     def system_requirements(self):
         if self.settings.os == 'Linux':
-            installer = tools.SystemPackageTool()
-            if self.settings.arch == 'x86':
-                installer.install("libxmu-dev:i386")
-                installer.install("libxaw7-dev:i386")
-                installer.install("libxt-dev:i386")
-                installer.install("libxrandr-dev:i386")
-            elif self.settings.arch == 'x86_64':
-                installer.install("libxmu-dev:amd64")
-                installer.install("libxaw7-dev:amd64")
-                installer.install("libxt-dev:amd64")
-                installer.install("libxrandr-dev:amd64")
+            installer = tools.SystemPackageTool(conanfile=self)
+            installer.install("libxmu-dev")
+            installer.install("libxaw7-dev")
+            installer.install("libxt-dev")
+            installer.install("libxrandr-dev")
 
     def source(self):
         tools.get("https://github.com/OGRECave/ogre/archive/v{0}.zip".format(self.version), sha256='43ddecf937191aae46acfb6bf73ef107b7366b0336bf0cfe49dea4b1bfc24ed9')
