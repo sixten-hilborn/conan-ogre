@@ -1,4 +1,5 @@
 from conans import ConanFile, CMake, tools
+from conans.errors import ConanInvalidConfiguration
 import os
 import fnmatch
 import glob
@@ -27,25 +28,19 @@ class OgreConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {
         "shared": [True, False],
-        "with_boost": [True, False],
         "with_cg": [True, False],
-        "node_storage_legacy": [True, False],
         "with_rendersystem_d3d9": [True, False],
         "with_rendersystem_d3d11": [True, False],
         "with_rendersystem_gl3plus": [True, False],
         "with_rendersystem_gl": [True, False],
-        "with_rendersystem_gles": [True, False],
         "with_rendersystem_gles2": [True, False],
     }
     default_options = {
         "shared": True,
-        "with_boost": False,
         "with_cg": True,
         "freetype:shared": False,
-        "node_storage_legacy": True,
         "with_rendersystem_gl3plus": True,
         "with_rendersystem_gl": True,
-        "with_rendersystem_gles": False,
         "with_rendersystem_gles2": False,
     }
     exports_sources = ['patches*']
@@ -76,10 +71,6 @@ class OgreConan(ConanFile):
             self.options.with_cg = False
 
     def requirements(self):
-        if self.options.with_boost:
-            if self.settings.compiler != "Visual Studio":
-                self.options["boost"].fPIC = True
-            self.requires("boost/1.67.0@conan/stable")
         if self.options.with_cg:
             self.requires("Cg/3.1@sixten-hilborn/stable")
 
@@ -148,14 +139,10 @@ class OgreConan(ConanFile):
         cmake.definitions['OGRE_BUILD_TESTS'] = False
         cmake.definitions['OGRE_BUILD_TOOLS'] = False
         cmake.definitions['OGRE_INSTALL_PDB'] = False
-        cmake.definitions['OGRE_USE_STD11'] = True
-        cmake.definitions['OGRE_USE_BOOST'] = self.options.with_boost
-        cmake.definitions['OGRE_NODE_STORAGE_LEGACY'] = self.options.node_storage_legacy
         cmake.definitions['OGRE_BUILD_RENDERSYSTEM_D3D9'] = self.options.with_rendersystem_d3d9
         cmake.definitions['OGRE_BUILD_RENDERSYSTEM_D3D11'] = self.options.with_rendersystem_d3d11
         cmake.definitions['OGRE_BUILD_RENDERSYSTEM_GL3PLUS'] = self.options.with_rendersystem_gl3plus
         cmake.definitions['OGRE_BUILD_RENDERSYSTEM_GL'] = self.options.with_rendersystem_gl
-        cmake.definitions['OGRE_BUILD_RENDERSYSTEM_GLES'] = self.options.with_rendersystem_gles
         cmake.definitions['OGRE_BUILD_RENDERSYSTEM_GLES2'] = self.options.with_rendersystem_gles2
         if self.settings.compiler == 'Visual Studio':
             cmake.definitions['OGRE_CONFIG_STATIC_LINK_CRT'] = str(self.settings.compiler.runtime).startswith('MT')
@@ -187,8 +174,6 @@ class OgreConan(ConanFile):
                 self.cpp_info.libs.append('RenderSystem_GL')
             if self.options.with_rendersystem_gl3plus:
                 self.cpp_info.libs.append('RenderSystem_GL3Plus')
-            if self.options.with_rendersystem_gles:
-                self.cpp_info.libs.append('RenderSystem_GLES')
             if self.options.with_rendersystem_gles2:
                 self.cpp_info.libs.append('RenderSystem_GLES2')
             if self.options.with_rendersystem_d3d9:
