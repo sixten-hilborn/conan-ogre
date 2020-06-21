@@ -19,7 +19,7 @@ def rename(pattern, name):
 
 class OgreConan(ConanFile):
     name = "ogre"
-    version = "1.10.12"
+    version = "1.12.7"
     description = "Open Source 3D Graphics Engine"
     folder = 'ogre-v' + version
     install_path = os.path.join('_build', folder, 'sdk')
@@ -101,7 +101,7 @@ class OgreConan(ConanFile):
             installer.install("libxrandr-dev")
 
     def source(self):
-        tools.get("https://github.com/OGRECave/ogre/archive/v{0}.zip".format(self.version), sha256='43ddecf937191aae46acfb6bf73ef107b7366b0336bf0cfe49dea4b1bfc24ed9')
+        tools.get("https://github.com/OGRECave/ogre/archive/v{0}.zip".format(self.version), sha256='531ff3af813d6833c1b3cd565c54dcebe4e84b4069fd64b59cea141a5f526704')
         rename('ogre-*', self.folder)
 
     def build(self):
