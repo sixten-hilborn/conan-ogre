@@ -86,7 +86,7 @@ class OgreConan(ConanFile):
     def build_requirements(self):
         if self.settings.os == 'Linux':
             installer = tools.SystemPackageTool(conanfile=self)
-            if self.options.with_rendersystem_gl or self.options.with_rendersystem_gl3plus:
+            if self._with_opengl():
                 installer.install('libgl1-mesa-dev')
                 installer.install('libglu1-mesa-dev')
             if self.options.with_rendersystem_gles2:
@@ -118,6 +118,8 @@ class OgreConan(ConanFile):
         # Fix for static build without DirectX 9
         if not self.options.with_rendersystem_d3d9:
             tools.replace_in_file('{0}/Components/Bites/CMakeLists.txt'.format(self.folder), ' ${DirectX9_INCLUDE_DIR}', '')
+
+        #tools.replace_in_file('{0}/PlugIns/CgProgramManager/include/OgreCgPlugin.h'.format(self.folder), '#include "OgrePlugin.h"', '#include <OGRE/OgrePlugin.h>')
 
         cmake = CMake(self)
         cmake.definitions['CMAKE_INSTALL_PREFIX'] = os.path.join(os.getcwd(), self.install_path)
@@ -155,21 +157,67 @@ class OgreConan(ConanFile):
         self.copy("*.so*", dst="lib", src=lib_dir, keep_path=False, links=True)
         self.copy("*.dylib", dst="lib", src=lib_dir, keep_path=False)
         self.copy("*.dll", dst="bin", src=bin_dir, keep_path=False)
+        # Copy resource file for Windows dialogs
+        if not self.options.shared and self.settings.os == 'Windows':
+            self.copy("*.res", dst="res", src='_build/OgreMain', keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = [
+        # All plugins must be linked at compile time instead of dynamically loaded for static builds
+        if not self.options.shared:
+            # Unfortunately some headers assumes the OGRE directory is an include path
+            self.cpp_info.includedirs.append('include/OGRE')
+
+            if self.options.with_rendersystem_gl:
+                self.cpp_info.libs.append('RenderSystem_GL')
+            if self.options.with_rendersystem_gl3plus:
+                self.cpp_info.libs.append('RenderSystem_GL3Plus')
+            if self.options.with_rendersystem_gles:
+                self.cpp_info.libs.append('RenderSystem_GLES')
+            if self.options.with_rendersystem_gles2:
+                self.cpp_info.libs.append('RenderSystem_GLES2')
+            if self.options.with_rendersystem_d3d9:
+                self.cpp_info.libs.append('RenderSystem_Direct3D9')
+            if self.options.with_rendersystem_d3d11:
+                self.cpp_info.libs.append('RenderSystem_Direct3D11')
+
+            if self._with_opengl():
+                self.cpp_info.libs.append('OgreGLSupport')
+
+            if self.options.with_cg:
+                self.cpp_info.libs.append('Plugin_CgProgramManager')
+
+            self.cpp_info.libs.extend([
+                'Plugin_BSPSceneManager',
+                'Plugin_OctreeSceneManager',
+                'Plugin_OctreeZone',
+                'Plugin_ParticleFX',
+                'Plugin_PCZSceneManager',
+            ])
+
+        self.cpp_info.libs.extend([
             'OgreMain',
             'OgreOverlay',
             'OgrePaging',
             'OgreProperty',
             'OgreRTShaderSystem',
             'OgreTerrain'
-        ]
+        ])
+        # 'OgreBites', OgreHLMS', 'OgreMeshLodGenerator', 'OgreVolume',
+
+
         if not self.options.shared: #and self.settings.os == 'Windows':
             self.cpp_info.libs = [lib+'Static' for lib in self.cpp_info.libs]
         #is_apple = (self.settings.os == 'Macos' or self.settings.os == 'iOS')
         if self.settings.build_type == "Debug" and self.settings.os == 'Windows': #not is_apple:
             self.cpp_info.libs = [lib+'_d' for lib in self.cpp_info.libs]
 
+        if not self.options.shared and self.settings.os == 'Windows':
+            # Link against resource file for Windows dialogs
+            self.cpp_info.sharedlinkflags.append(os.path.join(self.package_folder, self.cpp_info.resdirs[0], 'OgreWin32Resources.res'))
+            self.cpp_info.exelinkflags = self.cpp_info.sharedlinkflags
+
         if self.settings.os == 'Linux':
             self.cpp_info.libs.append('rt')
+
+    def _with_opengl(self):
+        return self.options.with_rendersystem_gl or self.options.with_rendersystem_gl3plus
