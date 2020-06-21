@@ -108,12 +108,28 @@ class OgreConan(ConanFile):
         apply_patches('patches', self.folder)
         tools.replace_in_file(
             '{0}/OgreMain/CMakeLists.txt'.format(self.folder),
-            'target_link_libraries(OgreMain ${LIBRARIES})',
-            'target_link_libraries(OgreMain ${LIBRARIES} ${CONAN_LIBS_ZLIB})')
+            '${ZZip_LIBRARIES}',
+            'CONAN_PKG::zlib')
+        tools.replace_in_file(
+            '{0}/OgreMain/CMakeLists.txt'.format(self.folder),
+            'list(APPEND LIBRARIES ZLIB::ZLIB)',
+            '')
         tools.replace_in_file(
             '{0}/Components/Overlay/CMakeLists.txt'.format(self.folder),
-            'target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES})',
-            'target_link_libraries(OgreOverlay OgreMain ${CONAN_LIBS_FREETYPE} ${CONAN_LIBS_BZIP2} ${CONAN_LIBS_LIBPNG} ${CONAN_LIBS_ZLIB})')
+            '${FREETYPE_LIBRARIES}',
+            'CONAN_PKG::freetype')
+        tools.replace_in_file(
+            '{0}/Components/Overlay/CMakeLists.txt'.format(self.folder),
+            'ZLIB::ZLIB',
+            'CONAN_PKG::zlib')
+        tools.replace_in_file(
+            '{0}/PlugIns/FreeImageCodec/CMakeLists.txt'.format(self.folder),
+            '${FreeImage_LIBRARIES}',
+            'CONAN_PKG::freeimage')
+        tools.replace_in_file(
+            '{0}/PlugIns/DotScene/CMakeLists.txt'.format(self.folder),
+            'pugixml',
+            'CONAN_PKG::pugixml')
 
         # Fix for static build without DirectX 9
         if not self.options.with_rendersystem_d3d9:
@@ -159,7 +175,7 @@ class OgreConan(ConanFile):
         self.copy("*.dll", dst="bin", src=bin_dir, keep_path=False)
         # Copy resource file for Windows dialogs
         if not self.options.shared and self.settings.os == 'Windows':
-            self.copy("*.res", dst="res", src='_build/OgreMain', keep_path=False)
+            self.copy("*.res", dst="res", src='_build/Components/Bites', keep_path=False)
 
     def package_info(self):
         # All plugins must be linked at compile time instead of dynamically loaded for static builds
