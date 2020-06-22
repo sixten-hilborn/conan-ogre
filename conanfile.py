@@ -303,6 +303,8 @@ class OgreConan(ConanFile):
 
         if self.settings.os == 'Linux':
             self.cpp_info.libs.append('rt')
+            if not self.options.shared:
+                self.cpp_info.libs.append('dl')
 
     def _with_opengl(self):
         return self.options.with_rendersystem_gl or self.options.with_rendersystem_gl3plus
