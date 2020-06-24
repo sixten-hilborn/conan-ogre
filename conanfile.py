@@ -162,11 +162,11 @@ class OgreConan(ConanFile):
             self.copy("*.res", dst="res", src='_build/OgreMain', keep_path=False)
 
     def package_info(self):
+        # Unfortunately some headers assumes the OGRE directory is an include path
+        self.cpp_info.includedirs.append('include/OGRE')
+
         # All plugins must be linked at compile time instead of dynamically loaded for static builds
         if not self.options.shared:
-            # Unfortunately some headers assumes the OGRE directory is an include path
-            self.cpp_info.includedirs.append('include/OGRE')
-
             if self.options.with_rendersystem_gl:
                 self.cpp_info.libs.append('RenderSystem_GL')
             if self.options.with_rendersystem_gl3plus:
