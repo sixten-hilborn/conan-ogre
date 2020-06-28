@@ -1,15 +1,15 @@
---- CMakeLists.txt	2020-06-21 18:20:08.353562900 +0200
-+++ CMakeLists.txt	2020-06-21 18:24:06.204007400 +0200
-@@ -59,6 +59,8 @@
+--- CMakeLists.txt	2020-06-28 10:29:32.010033600 +0200
++++ CMakeLists.txt	2020-06-28 10:32:37.592035800 +0200
+@@ -51,6 +51,8 @@
  endif ()
  
- project(OGRE VERSION 1.12.7)
+ project(OGRE VERSION 1.11.6)
 +include(../conanbuildinfo.cmake)
 +conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
  
  # extra version info
  set(OGRE_VERSION_SUFFIX "")
-@@ -71,6 +73,7 @@
+@@ -63,6 +65,7 @@
  
  # Include necessary submodules
  set(CMAKE_MODULE_PATH
@@ -17,7 +17,7 @@
    "${PROJECT_SOURCE_DIR}/CMake"
    "${PROJECT_SOURCE_DIR}/CMake/Utils"
    "${PROJECT_SOURCE_DIR}/CMake/Packages"
-@@ -143,12 +146,10 @@
+@@ -132,12 +135,10 @@
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
    # Enable intrinsics on MSVC in debug mode
    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")

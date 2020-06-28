@@ -20,7 +20,7 @@ def rename(pattern, name):
 
 class OgreConan(ConanFile):
     name = "ogre"
-    version = "1.12.7"
+    version = "1.11.6"
     description = "Open Source 3D Graphics Engine"
     folder = 'ogre-v' + version
     install_path = os.path.join('_build', folder, 'sdk')
@@ -36,7 +36,6 @@ class OgreConan(ConanFile):
         "with_plugin_bsp": [True, False],
         "with_plugin_octree": [True, False],
         "with_plugin_pfx": [True, False],
-        "with_plugin_dot_scene": [True, False],
         "with_plugin_pcz": [True, False],
         "with_plugin_cg": [True, False],
         "with_component_paging": [True, False],
@@ -45,7 +44,6 @@ class OgreConan(ConanFile):
         "with_component_volume": [True, False],
         "with_component_property": [True, False],
         "with_component_overlay": [True, False],
-        "with_component_overlay_imgui": [True, False],
         "with_component_hlms": [True, False],
         "with_component_bites": [True, False],
         "with_component_python": [True, False],
@@ -62,7 +60,6 @@ class OgreConan(ConanFile):
         "with_plugin_bsp": True,
         "with_plugin_octree": True,
         "with_plugin_pfx": True,
-        "with_plugin_dot_scene": True,
         "with_plugin_pcz": True,
         "with_plugin_cg": True,
         "with_component_paging": True,
@@ -71,8 +68,7 @@ class OgreConan(ConanFile):
         "with_component_volume": True,
         "with_component_property": True,
         "with_component_overlay": True,
-        "with_component_overlay_imgui": False,  # TODO: Enable by default?
-        "with_component_hlms": False,
+        "with_component_hlms": True,
         "with_component_bites": True,
         "with_component_python": False,
         "with_component_java": False,
@@ -105,17 +101,11 @@ class OgreConan(ConanFile):
             self.options.with_plugin_cg = False
 
     def requirements(self):
-        if self.options.with_plugin_dot_scene:
-            self.requires("pugixml/1.10")
         if self.options.with_plugin_cg:
             self.requires("Cg/3.1@sixten-hilborn/stable")
         if self.options.with_component_overlay:
             self.requires("freetype/2.10.1")
             self.requires("libpng/1.6.37")  # override freetype's libpng
-        if self.options.with_component_overlay_imgui:
-            if not self.options.with_component_overlay:
-                raise ConanInvalidConfiguration("with_component_overlay_imgui requires with_component_overlay")
-            self.requires("imgui/1.73@bincrafters/stable")  # FIXME: this package does not provide header <imgui_freetype.h>
         if self.options.with_component_bites and not self.options.with_component_overlay:
             raise ConanInvalidConfiguration("with_component_bites requires with_component_overlay")
         if not self.options.shared:
@@ -144,7 +134,7 @@ class OgreConan(ConanFile):
             installer.install("libxrandr-dev")
 
     def source(self):
-        tools.get("https://github.com/OGRECave/ogre/archive/v{0}.zip".format(self.version), sha256='531ff3af813d6833c1b3cd565c54dcebe4e84b4069fd64b59cea141a5f526704')
+        tools.get("https://github.com/OGRECave/ogre/archive/v{0}.zip".format(self.version), sha256='43395e72e5c8c1cc7048ae187c57c02eb2a6b52efa1c584f84b000267e6e315b')
         rename('ogre-*', self.folder)
 
     def build(self):
@@ -169,10 +159,6 @@ class OgreConan(ConanFile):
             '{0}/PlugIns/FreeImageCodec/CMakeLists.txt'.format(self.folder),
             '${FreeImage_LIBRARIES}',
             'CONAN_PKG::freeimage')
-        tools.replace_in_file(
-            '{0}/PlugIns/DotScene/CMakeLists.txt'.format(self.folder),
-            'pugixml',
-            'CONAN_PKG::pugixml')
 
         # Fix for static build without DirectX 9
         if not self.options.with_rendersystem_d3d9:
@@ -199,7 +185,6 @@ class OgreConan(ConanFile):
         cmake.definitions['OGRE_BUILD_PLUGIN_BSP'] = self.options.with_plugin_bsp
         cmake.definitions['OGRE_BUILD_PLUGIN_OCTREE'] = self.options.with_plugin_octree
         cmake.definitions['OGRE_BUILD_PLUGIN_PFX'] = self.options.with_plugin_pfx
-        cmake.definitions['OGRE_BUILD_PLUGIN_DOT_SCENE'] = self.options.with_plugin_dot_scene
         cmake.definitions['OGRE_BUILD_PLUGIN_PCZ'] = self.options.with_plugin_pcz
         cmake.definitions['OGRE_BUILD_PLUGIN_CG'] = self.options.with_plugin_cg
         cmake.definitions['OGRE_BUILD_COMPONENT_PAGING'] = self.options.with_component_paging
@@ -208,7 +193,6 @@ class OgreConan(ConanFile):
         cmake.definitions['OGRE_BUILD_COMPONENT_VOLUME'] = self.options.with_component_volume
         cmake.definitions['OGRE_BUILD_COMPONENT_PROPERTY'] = self.options.with_component_property
         cmake.definitions['OGRE_BUILD_COMPONENT_OVERLAY'] = self.options.with_component_overlay
-        cmake.definitions['OGRE_BUILD_COMPONENT_OVERLAY_IMGUI'] = self.options.with_component_overlay_imgui
         cmake.definitions['OGRE_BUILD_COMPONENT_HLMS'] = self.options.with_component_hlms
         cmake.definitions['OGRE_BUILD_COMPONENT_BITES'] = self.options.with_component_bites
         cmake.definitions['OGRE_BUILD_COMPONENT_PYTHON'] = self.options.with_component_python
@@ -266,8 +250,6 @@ class OgreConan(ConanFile):
             if self.options.with_plugin_pcz:
                 self.cpp_info.libs.append('Plugin_OctreeZone')
                 self.cpp_info.libs.append('Plugin_PCZSceneManager')
-            if self.options.with_plugin_dot_scene:
-                self.cpp_info.libs.append('Plugin_DotScene')
 
         self.cpp_info.libs.append('OgreMain')
         if self.options.with_component_overlay:
