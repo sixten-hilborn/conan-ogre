@@ -200,9 +200,10 @@ class OgreConan(ConanFile):
             'OgrePaging',
             'OgreProperty',
             'OgreRTShaderSystem',
-            'OgreTerrain'
+            'OgreTerrain',
+            'OgreBites',
         ])
-        # 'OgreBites', OgreHLMS', 'OgreMeshLodGenerator', 'OgreVolume',
+        # OgreHLMS', 'OgreMeshLodGenerator', 'OgreVolume',
 
 
         if not self.options.shared: #and self.settings.os == 'Windows':
