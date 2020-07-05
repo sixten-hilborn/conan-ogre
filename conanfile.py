@@ -216,6 +216,9 @@ class OgreConan(ConanFile):
             # Link against resource file for Windows dialogs
             self.cpp_info.sharedlinkflags.append(os.path.join(self.package_folder, self.cpp_info.resdirs[0], 'OgreWin32Resources.res'))
             self.cpp_info.exelinkflags = self.cpp_info.sharedlinkflags
+            # Add windows system libs for opengl
+            if self._with_opengl():
+                self.cpp_info.libs.extend(['glu32', 'opengl32'])
 
         if self.settings.os == 'Linux':
             self.cpp_info.libs.append('rt')
